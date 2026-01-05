@@ -1,0 +1,70 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  eval = F,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# easy.geom.recipes.package
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of the {easy.geom.recipes.package} is to show what's required to package a ggplot2 extension and specifically the user-facing function in the [easy-geom-recipes tutorial](https://evamaerey.github.io/easy-geom-recipes/)
+
+The 'easy geom recipes' are a new point of entry for people that are ggplot2 users, which focuses on learning some extension that can help you write `geom_*()` functions.
+
+The recipes have been successful:
+
+> I was never a “ggextender” myself until [going through the recipes]! ...Easy geom recipes [are] a series of tutorials on creating ggplot2 extensions. Following “recipes”, you methodically create three extensions. Each time, certain key knowledge points are reinforced and new variations are introduced. 'R Works' 
+
+<!-- > I'm reading your [tutorial] on ggproto. Great writing - [it makes extension feel more accessible than other materials I've seen]. -->
+
+> Just wanted to share that I'm spending some of my weekend reading your brilliant resource here. This is so well written and delightful as a resource; wish I had had it years ago and thrilled to know it now. Thank you for writing! -
+
+> The format works for me. I've read tutorials about creating extensions before but this one made it look easier and more intuitive. I want to try again writing my own! - 
+
+However, the recipes intentionally do not cover any packaging considerations.  Addressing packaging is the topic of this repo.  So that we can preserve a narrative about the package, we'll use a literate program packaging style, where packaging steps are recorded one document -- in our case, the README.Rmd.
+
+# Recipe 1. `geom_means()`  
+
+So now we will not only write a user-facing function that works, we'll also make these functions available in the package {easy.geom.recipes.package}. Packaging is not necessary to use extension mechanisms - but if your extensions are particularly nice, you may find it useful to access or share them via packaging.
+
+Almost verbatim from the recipes, we go through the steps...
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Step 1. Define compute
+compute_group_means <- function(data, scales){
+  
+  data |> 
+    summarize(x = mean(x, na.rm = TRUE),
+              y = mean(y, na.rm = TRUE))
+  
+}
+
+# Step 2. Define Stat object
+StatMeans <- ggproto("StatMeans",
+                     Stat,
+                     compute_group = compute_group_means,
+                     required_aes = c("x", "y"))
+
+# Step 3. Define User-Facing Functions (w/ ggplot2 >=v4.0)
+stat_means <- make_constructor(StatMeans, geom = GeomPoint)
+geom_means <- make_constructor(GeomPoint, stat = StatMeans)
+
+
+penguins
+# Step 4. Try it out
+# ggplot(penguins) + 
+#   aes(s)
+```
