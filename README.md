@@ -74,8 +74,8 @@ stat_means <- make_constructor(StatMeans, geom = GeomPoint)
 geom_means <- make_constructor(GeomPoint, stat = StatMeans)
 
 
-penguins
 # Step 4. Try it out
-# ggplot(penguins) + 
-#   aes(s)
+ggplot(cars) + 
+  aes(speed, dist) + 
+  geom_point()
 ```
