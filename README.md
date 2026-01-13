@@ -6,8 +6,8 @@
   - [Step 1 Define Compute, Test](#step-1-define-compute-test)
   - [Step 2.a Define Stat object,
     Test](#step-2a-define-stat-object-test)
-  - [Step 3. Define User-Facing Functions (w/ ggplot2 \>=v4.0),
-    Test](#step-3-define-user-facing-functions-w-ggplot2-v40-test)
+  - [Step 3. Define User-Facing Functions (w/ ggplot2 \>= v4.0),
+    Test](#step-3-define-user-facing-functions-w-ggplot2--v40-test)
 - [Packaging](#packaging)
   - [Phase 0. Set up package
     architecture](#phase-0-set-up-package-architecture)
@@ -124,7 +124,7 @@ ggplot(cars) +
 
 <img src="README_files/figure-gfm/unnamed-chunk-4-1.png" width="45%" />
 
-### Step 3. Define User-Facing Functions (w/ ggplot2 \>=v4.0), Test
+### Step 3. Define User-Facing Functions (w/ ggplot2 \>= v4.0), Test
 
 ``` r
 stat_means <- make_constructor(StatMeans, geom = GeomPoint)
@@ -181,7 +181,7 @@ skeleton. (it almost feels like testing the compute is sufficient 😬)
 compute_group_means <- function(data, scales){
   
   data |> 
-    dplyr::summarize(x = mean(.data$x, na.rm = TRUE),
+    dplyr::summarize(x = mean(.data$x, na.rm = TRUE),      ### using `::` to indicate dependency from dplyr   
                      y = mean(.data$y, na.rm = TRUE))
   
 }
@@ -189,14 +189,10 @@ compute_group_means <- function(data, scales){
 ##############################
 # Step 2. Define Stat object
 ##############################
-#' The Stat object
-#'
-#' This \code{ggproto} class creates the geom_means and stat_means layer. 
-#' It is not intended to be used by user.
-
 #' @name StatMeans
 #'
-#' @importFrom ggplot2 ggproto Stat
+#' ### using importFrom to indicate dependency from ggplot2, ggroto and Stat are used to define StatMeans   
+#' @importFrom ggplot2 ggproto Stat  
 #' @rdname Geom
 #' @format NULL
 #' @usage NULL
@@ -216,12 +212,8 @@ StatMeans <- ggproto("StatMeans",
 #' @rdname stat_means
 #' @importFrom ggplot2 make_constructor GeomPoint
 #' @inheritParams ggplot2::stat_identity
-#' @examples
-#' ggplot(penguins) + 
-#'  aes(x = bill_len, y = flipper_len) + 
-#'  geom_point() + 
-#'  stat_means(size = 9)
-#'  
+#' 
+#' @examples                               
 #' ggplot(penguins) + 
 #'  aes(x = bill_len, y = flipper_len, color = species) + 
 #'  geom_point() + 
@@ -235,11 +227,6 @@ stat_means <- make_constructor(StatMeans, geom = GeomPoint)
 #' @inheritParams ggplot2::stat_identity
 #' @examples
 #' ggplot(penguins) + 
-#'  aes(x = bill_len, y = flipper_len) + 
-#'  geom_point() + 
-#'  geom_means(size = 9)
-#'  
-#' ggplot(penguins) + 
 #'  aes(x = bill_len, y = flipper_len, color = species) + 
 #'  geom_point() + 
 #'  geom_means(size = 9)
@@ -251,8 +238,8 @@ geom_means <- make_constructor(GeomPoint, stat = StatMeans)
 ## Phase 3. Declaring dependencies
 
 We’ve indicated which functions we’ll use from other packages with the
-`::` syntax and with `@importFrom`. Now we need to declare this upfront,
-by adding them to our DESCRIPTION file. But never fear – we can do this
+`::` syntax and with `@importFrom`. Now also need to declare this up
+front, in our DESCRIPTION file. But never fear – we can do this
 automatically/programatically with `usethis::use_package()`.
 
 ``` r
@@ -262,12 +249,13 @@ usethis::use_package("dplyr")
 
 ## Phase 4. Create .R files and test files.
 
-The functions of our package actually need to live in our .R folder.
-We’ll copy the contents of the chunk ‘geom_means’ into a .R file of the
-same name with [{knitrExtra}](https://github.com/EvaMaeRey/knitrExtra).
+The functions of our package actually need to live in our `R` folder.
+We’ll copy the contents of the chunk ‘geom_means’ into a file with the
+`.R` extension of the same name, i.e. `geom_means.R`, with
+[{knitrExtra}](https://github.com/EvaMaeRey/knitrExtra).
 
 ``` r
-knitrExtra::chunk_to_dir("geom_means")
+knitrExtra::chunk_to_dir("geom_means", dir = "R")
 ```
 
 ## Phase 5. Document your functions

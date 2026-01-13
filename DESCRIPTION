@@ -1,9 +1,9 @@
 Package: easy.geom.recipes.package
-Title: What the Package Does (One Line, Title Case)
+Title: A package to complement the 'easy geom recipes' tutorial, for demoing packaging 'moves' for ggplot2 extensions
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Evangeline", "Reynolds", , "first.last@example.com", role = c("aut", "cre"))
+Description: This toy package is a companion to the 'easy geom recipes' tutorial. While the tutorial does not take on packaging consideration, this demo package goes through some general and gg-extension-specific packaging requirements.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
