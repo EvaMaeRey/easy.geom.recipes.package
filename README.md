@@ -1,27 +1,27 @@
 
 - [easy.geom.recipes.package](#easygeomrecipespackage)
-- [Phase 00. Baseline knowledge: Recipes review…
-  `geom_means()`](#phase-00-baseline-knowledge-recipes-review-geom_means)
+- [Part 00. Baseline knowledge: Recipes review…
+  `geom_means()`](#part-00-baseline-knowledge-recipes-review-geom_means)
   - [Step 0 Load packages](#step-0-load-packages)
   - [Step 1 Define Compute, Test](#step-1-define-compute-test)
   - [Step 2.a Define Stat object,
     Test](#step-2a-define-stat-object-test)
   - [Step 3. Define User-Facing Functions (w/ ggplot2 \>= v4.0),
     Test](#step-3-define-user-facing-functions-w-ggplot2--v40-test)
-- [Packaging](#packaging)
+- [Part 1. Basic Packaging](#part-1-basic-packaging)
   - [Phase 0. Set up package
     architecture](#phase-0-set-up-package-architecture)
   - [Phase 1. Documentation with
     Roxygen](#phase-1-documentation-with-roxygen)
-  - [Phase 2. Writing Tests](#phase-2-writing-tests)
-  - [Phase 3. Declaring dependencies](#phase-3-declaring-dependencies)
-  - [Phase 4. Create .R files and test
-    files.](#phase-4-create-r-files-and-test-files)
-  - [Phase 5. Document your functions](#phase-5-document-your-functions)
-  - [Phase 6. Check your package](#phase-6-check-your-package)
-  - [Phase 7. Install your package](#phase-7-install-your-package)
-- [Enjoy! You’ve created a ggplot2 extension
-  package!](#enjoy-youve-created-a-ggplot2-extension-package)
+  - [Phase 2. Declaring dependencies](#phase-2-declaring-dependencies)
+  - [Phase 3. Create .R files and test
+    files.](#phase-3-create-r-files-and-test-files)
+  - [Phase 4. Document your functions](#phase-4-document-your-functions)
+  - [Phase 5. Check your package](#phase-5-check-your-package)
+  - [Phase 6. Install your package &
+    Enjoy!](#phase-6-install-your-package--enjoy)
+- [Part 2. Make it robust](#part-2-make-it-robust)
+  - [Write tests…](#write-tests)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -57,7 +57,7 @@ The recipes have been successful:
 
 > The format works for me. I’ve read tutorials about creating extensions
 > before but this one made it look easier and more intuitive. I want to
-> try again writing my own! - Greg
+> try again writing my own! - Georgios Karamanis
 
 However, the recipes intentionally do not cover any packaging
 considerations (one thing at a time, right?.). Addressing packaging is
@@ -68,7 +68,7 @@ For an overview, you can look at the rendered (to html) .md file, but
 for the full packaging ‘story’, you may later want to check out the
 source `.Rmd` file.
 
-# Phase 00. Baseline knowledge: Recipes review… `geom_means()`
+# Part 00. Baseline knowledge: Recipes review… `geom_means()`
 
 So now we will not only write a user-facing function that works, we’ll
 also make these functions available in the package
@@ -142,7 +142,7 @@ last_plot() +
 
 <img src="README_files/figure-gfm/unnamed-chunk-5-1.png" width="45%" /><img src="README_files/figure-gfm/unnamed-chunk-5-2.png" width="45%" />
 
-# Packaging
+# Part 1. Basic Packaging
 
 ## Phase 0. Set up package architecture
 
@@ -233,9 +233,7 @@ stat_means <- make_constructor(StatMeans, geom = GeomPoint)
 geom_means <- make_constructor(GeomPoint, stat = StatMeans)
 ```
 
-## Phase 2. Writing Tests
-
-## Phase 3. Declaring dependencies
+## Phase 2. Declaring dependencies
 
 We’ve indicated which functions we’ll use from other packages with the
 `::` syntax and with `@importFrom`. Now also need to declare this up
@@ -247,7 +245,7 @@ usethis::use_package("ggplot2")
 usethis::use_package("dplyr")
 ```
 
-## Phase 4. Create .R files and test files.
+## Phase 3. Create .R files and test files.
 
 The functions of our package actually need to live in our `R` folder.
 We’ll copy the contents of the chunk ‘geom_means’ into a file with the
@@ -258,7 +256,7 @@ We’ll copy the contents of the chunk ‘geom_means’ into a file with the
 knitrExtra::chunk_to_dir("geom_means", dir = "R")
 ```
 
-## Phase 5. Document your functions
+## Phase 4. Document your functions
 
 You may need to clear your environment before doing the following:
 
@@ -266,19 +264,19 @@ You may need to clear your environment before doing the following:
 devtools::document(".")
 ```
 
-## Phase 6. Check your package
+## Phase 5. Check your package
 
 ``` r
 devtools::check(".")
 ```
 
-## Phase 7. Install your package
+## Phase 6. Install your package & Enjoy!
 
 ``` r
 devtools::install(".", upgrade = "never")
 ```
 
-# Enjoy! You’ve created a ggplot2 extension package!
+You’ve created a ggplot2 extension package! Enjoy:
 
 ``` r
 ggplot(penguins) + 
@@ -286,10 +284,46 @@ ggplot(penguins) +
      y = flipper_len, 
      color = species) + 
  geom_point() + 
- easy.geom.recipes.package::geom_means(size = 9)
+ easy.geom.recipes.package::geom_means(size = 9)  # Yahoo! it's working!
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+------------------------------------------------------------------------
+
+# Part 2. Make it robust
+
+But wait! is it a robust package? is it licensed? other stuff.
+
+## Write tests…
+
+Create a folder for your tests:
+
+``` r
+usethis::use_testthat()
+```
+
+Write a test..
+
+``` r
+testthat::test_that("compute_group_means collapses x and y to means", {
+                    
+      df <- data.frame(x = 1:10, y = 1:10) |> 
+           compute_group_means()
+
+  
+      expect_identical(
+        object = df, 
+        expected = data.frame(x = 5.5, y = 5.5))
+  }
+)
+```
+
+Shuttle test to right location.
+
+``` r
+knitrExtra::chunk_to_dir("test_compute_group_means", dir = "tests/testthat/")
+```
 
 <!-- Then in an interactive session you can have a look at the documentation your users will see. -->
 

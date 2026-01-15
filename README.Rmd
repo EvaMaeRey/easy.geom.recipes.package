@@ -33,11 +33,11 @@ The recipes have been successful:
 
 > Just wanted to share that I'm spending some of my weekend reading your brilliant resource here. This is so well written and delightful as a resource; wish I had had it years ago and thrilled to know it now. Thank you for writing! - Emily Riederer
 
-> The format works for me. I've read tutorials about creating extensions before but this one made it look easier and more intuitive. I want to try again writing my own! - Greg
+> The format works for me. I've read tutorials about creating extensions before but this one made it look easier and more intuitive. I want to try again writing my own! - Georgios Karamanis
 
 However, the recipes intentionally do not cover any packaging considerations (one thing at a time, right?.).  Addressing packaging is the topic of this repo.  So that we can preserve a narrative about the package, we'll use a 'literate program' packaging style, where packaging steps are recorded in a single document -- in our case, the README.Rmd.  For an overview, you can look at the rendered (to html) .md file, but for the full packaging 'story', you may later want to check out the source `.Rmd` file. 
 
-# Phase 00. Baseline knowledge: Recipes review...  `geom_means()`  
+# Part 00. Baseline knowledge: Recipes review...  `geom_means()`  
 
 So now we will not only write a user-facing function that works, we'll also make these functions available in the package {easy.geom.recipes.package}. Packaging is not necessary to use extension mechanisms - but if your extensions are particularly nice, you may find it useful to access or share them via packaging.
 
@@ -107,7 +107,7 @@ last_plot() +
   aes(color = species)
 ```
 
-# Packaging
+# Part 1. Basic Packaging
 
 ## Phase 0. Set up package architecture
 
@@ -196,12 +196,11 @@ geom_means <- make_constructor(GeomPoint, stat = StatMeans)
 ```
 
 
-## Phase 2. Writing Tests
 
 
 
 
-## Phase 3. Declaring dependencies
+## Phase 2. Declaring dependencies
 
 We've indicated which functions we'll use from other packages with the `::` syntax and with `@importFrom`.  Now also need to declare this up front, in our DESCRIPTION file.  But never fear -- we can do this automatically/programatically with `usethis::use_package()`.
 
@@ -210,7 +209,7 @@ usethis::use_package("ggplot2")
 usethis::use_package("dplyr")
 ```
 
-## Phase 4. Create .R files and test files.
+## Phase 3. Create .R files and test files.
 
 The functions of our package actually need to live in our `R` folder.  We'll copy the contents of the chunk 'geom_means' into a file with the `.R` extension of the same name, i.e. `geom_means.R`, with [{knitrExtra}](https://github.com/EvaMaeRey/knitrExtra).
 
@@ -221,7 +220,7 @@ knitrExtra::chunk_to_dir("geom_means", dir = "R")
 
 
 
-## Phase 5. Document your functions
+## Phase 4. Document your functions
 
 You may need to clear your environment before doing the following:
 
@@ -230,14 +229,14 @@ devtools::document(".")
 ```
 
 
-## Phase 6. Check your package
+## Phase 5. Check your package
 
 ```{r, eval = F}
 devtools::check(".")
 ```
 
 
-## Phase 7. Install your package
+## Phase 6. Install your package & Enjoy!
 
 
 ```{r, eval = F}
@@ -245,9 +244,7 @@ devtools::install(".", upgrade = "never")
 ```
 
 
-
-
-# Enjoy!  You've created a ggplot2 extension package!  
+You've created a ggplot2 extension package! Enjoy:  
 
 
 ```{r}
@@ -256,12 +253,46 @@ ggplot(penguins) +
      y = flipper_len, 
      color = species) + 
  geom_point() + 
- easy.geom.recipes.package::geom_means(size = 9)
+ easy.geom.recipes.package::geom_means(size = 9)  # Yahoo! it's working!
 ```
 
 
+-------------
 
+# Part 2. Make it robust
 
+But wait!  is it a robust package? is it licensed? other stuff.
+
+## Write tests...
+
+Create a folder for your tests:
+
+```{r, eval = F}
+usethis::use_testthat()
+```
+
+Write a test..
+
+```{r test_compute_group_means, eval = F}
+testthat::test_that("compute_group_means collapses x and y to means", {
+                    
+      df <- data.frame(x = 1:10, y = 1:10) |> 
+           compute_group_means()
+
+  
+      expect_identical(
+        object = df, 
+        expected = data.frame(x = 5.5, y = 5.5))
+  }
+)
+
+```
+
+Shuttle test to right location.
+
+```{r}
+knitrExtra::chunk_to_dir("test_compute_group_means", dir = "tests/testthat/")
+```
 
 <!-- Then in an interactive session you can have a look at the documentation your users will see. -->
 
